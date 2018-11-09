@@ -1,4 +1,5 @@
 from array import *
+import time
 """script for for main"""
 '''import CSP
 import Maze
@@ -62,10 +63,18 @@ class Graph:
             
     def solveSquare(self, x, y):
         done = False
+        print("outer")
+        #time.sleep(1.0)
+        self.printGraph()
+        print(x)
+        print(y)
+        print(self.graph[x][y].symbol)
         nextSquare = self.getNext(x, y)
         if nextSquare is None:
+            print("last square")
             return True
-        elif self.graph[x][y] != "_":
+        elif self.graph[x][y].symbol != '_':
+            print("occupied")
             done = self.solveSquare(nextSquare[0], nextSquare[1])
         else:
             options = set(())
@@ -73,11 +82,13 @@ class Graph:
                 options.add(i.lower())
             for i in options:
                 self.graph[x][y].symbol = i
+                print(i)
                 valid = self.checkConstraints(x, y)
                 if valid:
+                    print("valid")
                     done = self.solveSquare(nextSquare[0], nextSquare[1])
                     if done == True:
-                        break
+                        return done
             if done == False:
                 self.graph[x][y].symbol = '_'
         return done
@@ -97,30 +108,37 @@ class Graph:
     
     def checkConstraints(self, x, y):
         i = self.graph[x][y].symbol #symbol we're testing
-        if i != "_": 
-            return False
         valid = True
         nbors = self.findNeighbors(x, y)
         nbors.append(self.graph[x][y])
         
         for j in nbors:
+            if j.symbol == "_":
+                continue
+            print(j.symbol)
             cnbors = self.findNeighbors(j.x, j.y)
             if j.symbol.isupper(): #Make sure endpoints don't have more than one matching color coming out of them and that if it doesn't have any, that it has at least one blank adjacent square
-                symbolCount = inludesSquare(j.symbol.lower(), cnbors)
+                symbolCount = includesSquare(j.symbol.lower(), cnbors)
                 blankCount = includesSquare("_", cnbors)
+                print("is upper")
                 if symbolCount > 1:
                     valid = False
+                    print("too many connectors (upper)")
                 if blankCount == 0 and symbolCount != 1:
                     valid = False
+                    print("no available connectors (upper)")
             else: #Symbol is not an endpoint
                 symbolCount = includesSquare(j.symbol, cnbors)
                 blankCount = includesSquare("_", cnbors)
                 if symbolCount > 2:
                     valid = False
+                    print("too many connectors (lower)")
                 if symbolCount == 1 and blankCount < 1:
                     valid = False
+                    print("not enough blank 1")
                 if symbolCount == 0 and blankCount < 2:
                     valid = False
+                    print("not enough blank 2")
         return valid
                     
     def getNext(self, x, y):
@@ -148,7 +166,7 @@ g12x12 = Graph("_____________________________K_Y_G_____Y___G_____O_P______Q____R
 g14x14 = Graph("_______________B___A______________W____RP_D____A__W____________OB____G_OY______K_____________D____G___________________R_Y___________Q_______________________QP_______________K______________________", 14, 14)
 g5x5.printGraph()
 g5x5.solvePuzzleDumb()
-g5x5.printGraph()
+#g5x5.printGraph()
 '''
 g5x5.printGraph()
 g5x5.getOptions(3, 3)
