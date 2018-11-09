@@ -31,48 +31,6 @@ class Graph:
                     k += 1
             self.graph.append(line)
         self.colors.remove("_")
-    '''def getOptions(self, x, y): #returns all variables that work
-        options = set(())
-        for i in self.colors:
-            options.add(i.lower())
-        usedSymbols = []
-        if x > 0:
-            l = self.graph[x-1][y].symbol
-            usedSymbols.append(l)
-        if x < self.xdim - 2:
-            r = self.graph[x+1][y].symbol
-            usedSymbols.append(r)
-        if y < self.ydim - 2:
-            u = self.graph[x][y+1].symbol
-            usedSymbols.append(u)
-        if y > 0:
-            d = self.graph[x][y-1].symbol
-            usedSymbols.append(d)
-        if x > 0 and y > 0:
-            dl = self.graph[x-1][y-1].symbol
-            usedSymbols.append(dl)
-        if x > 0 and y < self.ydim - 2:
-            ul = self.graph[x-1][y+1]
-            usedSymbols.append(ul)
-        if x < self.xdim - 2 and y > 0:
-            dr = self.graph[x+1][y-1].symbol
-            usedSymbols.append(dr)
-        if x < self.xdim - 2 and y < self.ydim - 2:
-            ur = self.graph[x+1][y+1].symbol
-            usedSymbols.append(ur)
-            
-        while "_" in usedSymbols: 
-            usedSymbols.remove("_")
-        for i in usedSymbols:
-            usedSymbols.pop(usedSymbols.index(i))
-            if i in usedSymbols:
-                usedSymbols.pop(usedSymbols.index(i))
-                if i in usedSymbols:
-                    options.remove(i)
-                    
-        for i in options:
-            print(i)
-        print(self.graph[x][y].symbol)'''
         
     def solvePuzzleDumb(self):
         if solveSquare(0, 0):
