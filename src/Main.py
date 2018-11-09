@@ -1,13 +1,20 @@
 """script for for main"""
 import CSP
 import Maze
+import sys
 
 if __name__ == "__main__":
     print("hello world")
-    print(Maze.maze5[2][2])
-    print(Maze.maze7[2][2])
-    print(Maze.maze8[2][2])
-    print(Maze.maze9[2][2])
-    print(Maze.maze10[2][2])
-    print(Maze.maze12[2][2])
-    print(Maze.maze14[2][2])
+    file = str(sys.argv[1])
+
+    with open(file) as f:
+        lines = f.readlines()
+    lines = [l.strip() for l in lines]
+
+    dim = len(lines[0])
+    dim2 = len(lines)
+    print(dim)
+    print(dim2)
+    graph = ""
+    for l in lines:
+        graph = graph + l
