@@ -80,7 +80,7 @@ class Graph:
                         break
             if done == False:
                 self.graph[x][y].symbol = '_'
-            return done
+        return done
             
     def findNeighbors(self, x, y):
         nbors = list(())
