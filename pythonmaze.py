@@ -1,9 +1,31 @@
 from array import *
+"""script for for main"""
+'''import CSP
+import Maze
+import sys
 
-def includesSquare(symbol, symbolList):
+if __name__ == "__main__":
+    print("hello world")
+    file = str(sys.argv[1])
+
+    with open(file) as f:
+        lines = f.readlines()
+    lines = [l.strip() for l in lines]
+
+    dim = len(lines[0])
+    dim2 = len(lines)
+    print(dim)
+    print(dim2)
+    graph = ""
+    for l in lines:
+        graph = graph + l'''
+
+
+def includesSquare(symbol, squareList):
     count = 0
-    while symbol in symbolList:
-        symbolList.remove(symbol)
+    for i in squareList:
+        if i.symbol = symbol
+        #squareList.remove(i)
         count += 1
     return count
 
@@ -78,12 +100,24 @@ class Graph:
         nbors.append(self.graph[x][y].symbol)
         
         for j in nbors:
-            if(j.symbol.isupper()):
-                cnbors = findNeighbors(j.x, j.y)
-                if(j.symbol.lower in findNeighbors)
-                #endpoint
-            
-        
+            cnbors = findNeighbors(j.x, j.y)
+            if j.symbol.isupper(): #Make sure endpoints don't have more than one matching color coming out of them and that if it doesn't have any, that it has at least one blank adjacent square
+                symbolCount = inludesSquare(j.symbol.lower(), cnbors)
+                blankCount = includesSquare("_", cnbors)
+                if symbolCount > 1:
+                    valid = False
+                if blankCount == 0 and symbolCount != 1:
+                    valid = False
+            else: #Symbol is not an endpoint
+                symbolCount = includesSquare(j.symbol, cnbors)
+                blankCount = includesSquare("_", cnbors)
+                if symbolCount > 2:
+                    valid = False
+                if symbolCount == 1 and blankCount < 1
+                    valid = False
+                if symbolCount == 0 and blankCount < 2
+                    valid = False
+        return valid
                     
     def getNext(self, x, y):
         if x == self.xdim - 1 and y == self.ydim - 1:
