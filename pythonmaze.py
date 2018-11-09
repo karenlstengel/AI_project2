@@ -8,8 +8,10 @@ def includesSquare(symbol, symbolList):
     return count
 
 class Square:
-    def __init__(self, symbol):
+    def __init__(self, symbol, x, y):
         self.symbol = symbol
+        self.x = x
+        self.y = y
 
 class Graph:
     def __init__(self, inString, x, y):
@@ -23,13 +25,13 @@ class Graph:
             line = []
             for j in range(y):
                 if k <= end:
-                    line.append(Square(inString[k]))
+                    line.append(Square(inString[k], i, j))
                     if inString[k] not in self.colors:
                         self.colors.add(inString[k])
                     k += 1
             self.graph.append(line)
         self.colors.remove("_")
-    def getOptions(self, x, y):
+    '''def getOptions(self, x, y): #returns all variables that work
         options = set(())
         for i in self.colors:
             options.add(i.lower())
@@ -59,7 +61,7 @@ class Graph:
             ur = self.graph[x+1][y+1].symbol
             usedSymbols.append(ur)
             
-        while "_" in usedSymbols:
+        while "_" in usedSymbols: 
             usedSymbols.remove("_")
         for i in usedSymbols:
             usedSymbols.pop(usedSymbols.index(i))
@@ -70,7 +72,68 @@ class Graph:
                     
         for i in options:
             print(i)
-        print(self.graph[x][y].symbol)
+        print(self.graph[x][y].symbol)'''
+        
+    def solvePuzzleDumb(self):
+        if solveSquare(0, 0):
+            return self.graph
+        else:
+            print("No solution.")
+            
+    def solveSquare(self, x, y):
+        done = False
+        nextSquare = getNext(x, y)
+        if nextSquare is None:
+            return True
+        else:
+            options = set(())
+            for i in self.colors:
+                options.add(i.lower())
+            for i in options:
+                self.graph[x][y].symbol = i
+                valid = checkConstraints(x, y)
+                if valid:
+                    done = solveSquare(self, x, y)
+                    if done == True:
+                        break
+            if done == False:
+                self.graph[x][y].symbol = '_'
+            return done
+            
+    def findNeighbors(self, x, y):
+        nbors = list(())
+        nbors.append(self.graph[x][y])
+        if(x > 0):
+            nbors.append(self.graph[x-1][y])
+        if(y > 0):
+            nbors.append(self.graph[x][y-1])
+        if(x < self.xdim - 1):
+            nbors.append(self.graph[x+1][y])
+        if(y < self.ydim - 1):
+            nbors.append(self.graph[x][y+1])
+        return nbors
+    
+    def checkConstraints(self, x, y):
+        i = self.graph[x][y].symbol #symbol we're testing
+        valid = True
+        nbors = findNeighbors(x, y)
+        nbors.append(self.graph[x][y].symbol)
+        
+        for j in nbors:
+            if(j.symbol.isupper()):
+                cnbors = findNeighbors(j.x, j.y)
+                if(j.symbol.lower in findNeighbors)
+                #endpoint
+            
+        
+                    
+    def getNext(self, x, y):
+        if x == self.xdim - 1 and y == self.ydim - 1:
+            return None
+        elif x == self.xdim - 1:
+            return [0, y + 1]
+        else:
+            return [x + 1, y]
     
     def printGraph(self):
         for i in range(self.xdim):
@@ -87,9 +150,10 @@ g9x9 = Graph("D__BOK_____O__R_____RQ__Q__DB________G__________P____G__Y___Y_____
 g10x10 = Graph("RG____________O___O__YP_Q___Q_____________G_____________R_________B___P__________Y______B___________", 10, 10)
 g12x12 = Graph("_____________________________K_Y_G_____Y___G_____O_P______Q____R_OQ_________P_ARK____D__D_W_______________W___B_______B__________A_____________", 12, 12)
 g14x14 = Graph("_______________B___A______________W____RP_D____A__W____________OB____G_OY______K_____________D____G___________________R_Y___________Q_______________________QP_______________K______________________", 14, 14)
+'''
 g5x5.printGraph()
 g5x5.getOptions(3, 3)
 g7x7.printGraph()
 g7x7.getOptions(4, 4)
 g14x14.printGraph()
-g14x14.getOptions(7, 7)
+g14x14.getOptions(7, 7)'''
