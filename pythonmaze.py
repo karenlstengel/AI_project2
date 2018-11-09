@@ -24,9 +24,9 @@ if __name__ == "__main__":
 def includesSquare(symbol, squareList):
     count = 0
     for i in squareList:
-        if i.symbol = symbol
+        if i.symbol == symbol:
         #squareList.remove(i)
-        count += 1
+            count += 1
     return count
 
 class Square:
@@ -55,14 +55,14 @@ class Graph:
         self.colors.remove("_")
         
     def solvePuzzleDumb(self):
-        if solveSquare(0, 0):
+        if self.solveSquare(0, 0):
             return self.graph
         else:
             print("No solution.")
             
     def solveSquare(self, x, y):
         done = False
-        nextSquare = getNext(x, y)
+        nextSquare = self.getNext(x, y)
         if nextSquare is None:
             return True
         else:
@@ -71,9 +71,9 @@ class Graph:
                 options.add(i.lower())
             for i in options:
                 self.graph[x][y].symbol = i
-                valid = checkConstraints(x, y)
+                valid = self.checkConstraints(x, y)
                 if valid:
-                    done = solveSquare(self, x, y)
+                    done = self.solveSquare(self, x, y)
                     if done == True:
                         break
             if done == False:
@@ -96,11 +96,11 @@ class Graph:
     def checkConstraints(self, x, y):
         i = self.graph[x][y].symbol #symbol we're testing
         valid = True
-        nbors = findNeighbors(x, y)
-        nbors.append(self.graph[x][y].symbol)
+        nbors = self.findNeighbors(x, y)
+        nbors.append(self.graph[x][y])
         
         for j in nbors:
-            cnbors = findNeighbors(j.x, j.y)
+            cnbors = self.findNeighbors(j.x, j.y)
             if j.symbol.isupper(): #Make sure endpoints don't have more than one matching color coming out of them and that if it doesn't have any, that it has at least one blank adjacent square
                 symbolCount = inludesSquare(j.symbol.lower(), cnbors)
                 blankCount = includesSquare("_", cnbors)
@@ -113,9 +113,9 @@ class Graph:
                 blankCount = includesSquare("_", cnbors)
                 if symbolCount > 2:
                     valid = False
-                if symbolCount == 1 and blankCount < 1
+                if symbolCount == 1 and blankCount < 1:
                     valid = False
-                if symbolCount == 0 and blankCount < 2
+                if symbolCount == 0 and blankCount < 2:
                     valid = False
         return valid
                     
@@ -142,6 +142,9 @@ g9x9 = Graph("D__BOK_____O__R_____RQ__Q__DB________G__________P____G__Y___Y_____
 g10x10 = Graph("RG____________O___O__YP_Q___Q_____________G_____________R_________B___P__________Y______B___________", 10, 10)
 g12x12 = Graph("_____________________________K_Y_G_____Y___G_____O_P______Q____R_OQ_________P_ARK____D__D_W_______________W___B_______B__________A_____________", 12, 12)
 g14x14 = Graph("_______________B___A______________W____RP_D____A__W____________OB____G_OY______K_____________D____G___________________R_Y___________Q_______________________QP_______________K______________________", 14, 14)
+g5x5.printGraph()
+g5x5.solvePuzzleDumb()
+g5x5.printGraph()
 '''
 g5x5.printGraph()
 g5x5.getOptions(3, 3)
