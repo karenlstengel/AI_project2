@@ -11,6 +11,8 @@ if __name__ == "__main__":
         lines = f.readlines()
     lines = [l.strip() for l in lines]
 
+    for l in lines:
+        print(l)
     dim = len(lines[0])
     dim2 = len(lines)
     print(dim)
