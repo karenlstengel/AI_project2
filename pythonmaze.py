@@ -65,6 +65,8 @@ class Graph:
         nextSquare = self.getNext(x, y)
         if nextSquare is None:
             return True
+        elif self.graph[x][y] != "_":
+            done = self.solveSquare(nextSquare[0], nextSquare[1])
         else:
             options = set(())
             for i in self.colors:
@@ -73,7 +75,7 @@ class Graph:
                 self.graph[x][y].symbol = i
                 valid = self.checkConstraints(x, y)
                 if valid:
-                    done = self.solveSquare(self, x, y)
+                    done = self.solveSquare(nextSquare[0], nextSquare[1])
                     if done == True:
                         break
             if done == False:
@@ -95,6 +97,8 @@ class Graph:
     
     def checkConstraints(self, x, y):
         i = self.graph[x][y].symbol #symbol we're testing
+        if i != "_": 
+            return False
         valid = True
         nbors = self.findNeighbors(x, y)
         nbors.append(self.graph[x][y])
