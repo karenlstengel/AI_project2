@@ -8,8 +8,10 @@ def includesSquare(symbol, symbolList):
     return count
 
 class Square:
-    def __init__(self, symbol):
+    def __init__(self, symbol, x, y):
         self.symbol = symbol
+        self.x = x
+        self.y = y
 
 class Graph:
     def __init__(self, inString, x, y):
@@ -23,7 +25,7 @@ class Graph:
             line = []
             for j in range(y):
                 if k <= end:
-                    line.append(Square(inString[k]))
+                    line.append(Square(inString[k], i, j))
                     if inString[k] not in self.colors:
                         self.colors.add(inString[k])
                     k += 1
@@ -79,18 +81,51 @@ class Graph:
             print("No solution.")
             
     def solveSquare(self, x, y):
+        done = False
         nextSquare = getNext(x, y)
         if nextSquare is None:
-            return true
+            return True
         else:
             options = set(())
             for i in self.colors:
                 options.add(i.lower())
             for i in options:
-                valid = checkOption(i)
+                self.graph[x][y].symbol = i
+                valid = checkConstraints(x, y)
                 if valid:
-                    self.graph[x][y].symbol = i
-                    
+                    done = solveSquare(self, x, y)
+                    if done == True:
+                        break
+            if done == False:
+                self.graph[x][y].symbol = '_'
+            return done
+            
+    def findNeighbors(self, x, y):
+        nbors = list(())
+        nbors.append(self.graph[x][y])
+        if(x > 0):
+            nbors.append(self.graph[x-1][y])
+        if(y > 0):
+            nbors.append(self.graph[x][y-1])
+        if(x < self.xdim - 1):
+            nbors.append(self.graph[x+1][y])
+        if(y < self.ydim - 1):
+            nbors.append(self.graph[x][y+1])
+        return nbors
+    
+    def checkConstraints(self, x, y):
+        i = self.graph[x][y].symbol #symbol we're testing
+        valid = True
+        nbors = findNeighbors(x, y)
+        nbors.append(self.graph[x][y].symbol)
+        
+        for j in nbors:
+            if(j.symbol.isupper()):
+                cnbors = findNeighbors(j.x, j.y)
+                if(j.symbol.lower in findNeighbors)
+                #endpoint
+            
+        
                     
     def getNext(self, x, y):
         if x == self.xdim - 1 and y == self.ydim - 1:
