@@ -98,6 +98,9 @@ class Graph:
                             return done
             if done == False: #rewrite over the symbol as blank of none of this options are valid
                 self.graph[x][y].symbol = '_'
+                nbors = self.findNeighbors(x, y)
+                for i in nbors:
+                    i.constrained -= 1
         return done #return solution or not
             
     def findNeighbors(self, x, y): #returns all neighbors of a square in a list
