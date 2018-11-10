@@ -35,9 +35,6 @@ class Square:
         self.x = x
         self.y = y
         self.constrained = 0
-    
-    def getSymbol(self):
-        return self.symbol
 
 class Graph:
     def __init__(self, inString, x, y):
@@ -71,11 +68,7 @@ class Graph:
     def solvePuzzleSmart(self):
         print("Unsolved Puzzle:")
         self.printGraph()
-        startSearch = self.findMostConstrained()
-        x = startSearch.x
-        y = startSearch.y
-        print(startSearch)
-        if self.solveSquare(x, y, "smart"):
+        if self.solveSquare(x=0, y=0, smartOrDumb="smart"):
             print("Solution:")
             self.printGraph()
             #return self.graph
@@ -86,7 +79,7 @@ class Graph:
         #if this is the last square, that means we've found a solution
         done = False #keeps track of whether constraints are violated
         nextSquare = self.getNext(x, y, smartOrDumb)
-        if self.graph[x][y].symbol != '_' and nextSquare is not None: #not a filled square and not the last square
+        if self.graph[x][y].symbol != "_" and nextSquare is not None: #not a filled square and not the last square
             done = self.solveSquare(nextSquare[0], nextSquare[1], smartOrDumb)
         else: #this square must be blank
             options = set(())
@@ -127,7 +120,7 @@ class Graph:
         if current.symbol != "_":
             return None
         else:
-            return current    
+            return [current.x, current.y]    
     
     def howConstrained(self, nbors): #determines how constrained by finding number of non-blank neighbors
         count = 0
@@ -180,11 +173,8 @@ class Graph:
                 #self.howConstrained(self.findNeighbors(i.x, i.y))
                 i.constrained += 1
             answer = self.findMostConstrained()
-            self.graph[x][y] = "_"
-            if answer is None:
-                return answer
-            else:
-                return [answer.x, answer.y]
+            self.graph[x][y].symbol = "_"
+            return answer
     
     def printGraph(self):
         for i in range(self.xdim):
