@@ -68,7 +68,8 @@ class Graph:
     def solvePuzzleSmart(self):
         print("Unsolved Puzzle:")
         self.printGraph()
-        if self.solveSquare(x=0, y=0, smartOrDumb="smart"):
+        startSqr = self.findMostConstrained()
+        if self.solveSquare(startSqr[0], startSqr[1], smartOrDumb="smart"):
             print("Solution:")
             self.printGraph()
             #return self.graph
@@ -115,7 +116,7 @@ class Graph:
         current = self.graph[0][0]
         for i in range(self.xdim):
             for j in range(self.ydim):
-                if self.graph[i][j].constrained >= current.constrained and self.graph[i][j].symbol == "_":
+                if (self.graph[i][j].constrained >= current.constrained and self.graph[i][j].symbol == "_") or (current.symbol != "_" and self.graph[i][j].symbol == "_"):
                     current = self.graph[i][j]
         if current.symbol != "_":
             return None
