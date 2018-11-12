@@ -1,4 +1,5 @@
 from array import *
+import time
 
 """script for for main"""
 """import CSP
@@ -119,6 +120,7 @@ class Graph:
         current = self.graph[0][0]
         for i in range(self.xdim):
             for j in range(self.ydim):
+                self.graph[i][j].constrained = self.howConstrained(self.findNeighbors(i, j))
                 if (self.graph[i][j].constrained >= current.constrained and self.graph[i][j].symbol == "_") or (current.symbol != "_" and self.graph[i][j].symbol == "_"):
                     current = self.graph[i][j]
         if current.symbol != "_":
@@ -187,7 +189,6 @@ class Graph:
                 line += self.graph[i][j].symbol
             print(line)
         
-
 g5x5 = Graph("B__RO___Y___Y___RO_G_BG__", 5, 5)
 g7x7 = Graph("___O____B__GY____BR_____Y____________R____G___O__", 7, 7)
 g8x8 = Graph("___R__G__BYP_______O_GR____P__________Y_____BOQ__Q______________", 8, 8)
@@ -195,6 +196,10 @@ g9x9 = Graph("D__BOK_____O__R_____RQ__Q__DB________G__________P____G__Y___Y_____
 g10x10 = Graph("RG____________O___O__YP_Q___Q_____________G_____________R_________B___P__________Y______B___________", 10, 10)
 g12x12 = Graph("_____________________________K_Y_G_____Y___G_____O_P______Q____R_OQ_________P_ARK____D__D_W_______________W___B_______B___________A_____________", 12, 12)
 g14x14 = Graph("_______________B___A______________W____RP_D____A__W____________OB____G_OY______K_____________D____G___________________R_Y___________Q_______________________QP_______________K______________________", 14, 14)
-
-g12x12.solvePuzzleDumb()
-#g5x5.findMostConstrained()
+currentTime = time.time()
+g8x8.solvePuzzleDumb()
+print(time.time() - currentTime)
+g8x8 = Graph("___R__G__BYP_______O_GR____P__________Y_____BOQ__Q______________", 8, 8)
+currentTime = time.time()
+g8x8.solvePuzzleSmart()
+print(time.time() - currentTime)
