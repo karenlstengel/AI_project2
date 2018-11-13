@@ -55,6 +55,10 @@ class Graph:
                     k += 1
             self.graph.append(line)
         self.colors.remove("_") #remove blank squares
+        self.squaresByConst = list(())
+
+    def getConstrained(self, square):
+        return square.constrained
         
     def solvePuzzleDumb(self):
         print("Unsolved Puzzle:")
@@ -66,8 +70,34 @@ class Graph:
         else:
             print("No solution.")
 
+    def solvePuzzleDumb2(self):
+        print("Unsolved Puzzle:")
+        self.printGraph()
+        if self.solveSquareDumb2(0, 0):
+            print("Solution:")
+            self.printGraph()
+            #return self.graph
+        else:
+            print("No solution.")
+
     def solvePuzzleSmart(self):
         print("Unsolved Puzzle:")
+        self.printGraph()
+        for i in range(self.xdim):
+            for j in range(self.ydim):
+                if self.graph[i][j].symbol == "_":
+                    self.graph[i][j].constrained = self.howConstrained(self.findNeighbors(i, j))
+                    self.squaresByConst.append(self.graph[i][j])
+        self.squaresByConst.sort(key=self.getConstrained, reverse=True)
+        start = self.nextSquareSmart(0)
+        if(self.solveSquareSmart(start[0], start[1], 0)):
+            print("Solution:")
+            self.printGraph()
+            #return self.graph
+        else:
+            print("No Solution.")
+
+        """print("Unsolved Puzzle:")
         self.printGraph()
         startSqr = self.findMostConstrained()
         if self.solveSquare(startSqr[0], startSqr[1], smartOrDumb="smart"):
@@ -75,7 +105,7 @@ class Graph:
             self.printGraph()
             #return self.graph
         else:
-            print("No solution.")
+            print("No solution.")"""
             
     def solveSquare(self, x, y, smartOrDumb):
         #if this is the last square, that means we've found a solution
@@ -103,7 +133,72 @@ class Graph:
                 for i in nbors:
                     i.constrained -= 1
         return done #return solution or not
-            
+
+    def solveSquareSmart(self, x, y, index):
+        #if this is the last square, that means we've found a solution
+        done = False #keeps track of whether constraints are violated
+        nextSquare = self.nextSquareSmart(index + 1)
+        if self.graph[x][y].symbol != "_" and nextSquare is not None: #not a filled square and not the last square
+            done = self.solveSquareSmart(nextSquare[0], nextSquare[1], index + 1)
+        else: #this square must be blank
+            options = set(())
+            for i in self.colors: #create a list of lower case colors available
+                options.add(i.lower())
+            for i in options: #loop through all possible colors, checking validity of each one
+                self.graph[x][y].symbol = i 
+                #print(len(self.squaresByConst))
+                #self.printGraph()
+                #time.sleep(1)#pick a color and assign it
+                valid = self.checkConstraints(x, y) #make sure this doesn't violate any constraints
+                if valid:
+                    if nextSquare is None: #if this is the last square, then we've reached a solution, so return
+                        return True
+                    else:
+                        done = self.solveSquareSmart(nextSquare[0], nextSquare[1], index + 1) #recursively call the solve method on the next square
+                        if done == True: #end if we've reached a solution
+                            return done
+            if done == False: #rewrite over the symbol as blank of none of this options are valid
+                self.graph[x][y].symbol = '_'
+        return done #return solution or not
+
+    def nextSquareSmart(self, index):
+        if len(self.squaresByConst) - 1 < index:
+            return None
+        else:
+            square = self.squaresByConst[index]
+            return [square.x, square.y]
+
+
+    def solveSquareDumb2(self, x, y):
+        #if this is the last square, that means we've found a solution
+        done = False #keeps track of whether constraints are violated
+        nextSquare = self.getNext(x, y, "dumb")
+        if self.graph[x][y].symbol != "_" and nextSquare is not None: #not a filled square and not the last square
+            done = self.solveSquareDumb2(nextSquare[0], nextSquare[1])
+        else: #this square must be blank
+            options = set(())
+            for i in self.colors: #create a list of lower case colors available
+                options.add(i.lower())
+            for i in options: #loop through all possible colors, checking validity of each one
+                self.graph[x][y].symbol = i #pick a color and assign it
+                #self.printGraph() #for debugging
+                #time.sleep(1)
+                if nextSquare is None:
+                    done = True
+                    for xi in range(self.xdim):
+                        for yi in range(self.ydim):
+                            if self.checkConstraints(xi, yi) == False:
+                                done = False
+                    if done == True:
+                        return done
+                else: 
+                    done = self.solveSquareDumb2(nextSquare[0], nextSquare[1]) #recursively call the solve method on the next square
+                    if done == True: #end if we've reached a solution
+                        return done
+            if done == False: #rewrite over the symbol as blank of none of this options are valid
+                self.graph[x][y].symbol = '_'
+        return done #return solution or not
+
     def findNeighbors(self, x, y): #returns all neighbors of a square in a list
         nbors = list(())
         if(x > 0):
@@ -172,6 +267,12 @@ class Graph:
                 return [0, y + 1]
             else:
                 return [x + 1, y]
+        elif smartOrDumb == "smart":
+            if len(self.squaresByConst) == 0:
+                return None
+            else:
+                square = self.squaresByConst.pop(0)
+                return [square.x, square.y]
         else:
             #self.graph[x][y] = "1"
             nbors = self.findNeighbors(x, y)
@@ -197,9 +298,14 @@ g10x10 = Graph("RG____________O___O__YP_Q___Q_____________G_____________R_______
 g12x12 = Graph("_____________________________K_Y_G_____Y___G_____O_P______Q____R_OQ_________P_ARK____D__D_W_______________W___B_______B___________A_____________", 12, 12)
 g14x14 = Graph("_______________B___A______________W____RP_D____A__W____________OB____G_OY______K_____________D____G___________________R_Y___________Q_______________________QP_______________K______________________", 14, 14)
 currentTime = time.time()
-g8x8.solvePuzzleDumb()
+#g5x5.solvePuzzleDumb2()
+#g5x5.solvePuzzleSmart()
+g12x12.solvePuzzleDumb()
 print(time.time() - currentTime)
-g8x8 = Graph("___R__G__BYP_______O_GR____P__________Y_____BOQ__Q______________", 8, 8)
+
+#g5x5 = Graph("B__RO___Y___Y___RO_G_BG__", 5, 5)
+g9x9 = Graph("D__BOK_____O__R_____RQ__Q__DB________G__________P____G__Y___Y________KP__________", 9, 9)
 currentTime = time.time()
+#g5x5.solvePuzzleDumb()
 g8x8.solvePuzzleSmart()
 print(time.time() - currentTime)
