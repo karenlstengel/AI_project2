@@ -54,13 +54,13 @@ class Graph:
                     k += 1
             self.graph.append(line)
         self.colors.remove("_")
-        
+
     def solvePuzzleDumb(self):
         if self.solveSquare(0, 0):
             return self.graph
         else:
             print("No solution.")
-            
+
     def solveSquare(self, x, y):
         done = False
         print("outer")
@@ -82,7 +82,7 @@ class Graph:
                 options.add(i.lower())
             for i in options:
                 self.graph[x][y].symbol = i
-                print(i)
+                #print(i)
                 valid = self.checkConstraints(x, y)
                 if valid:
                     print("valid")
@@ -92,7 +92,7 @@ class Graph:
             if done == False:
                 self.graph[x][y].symbol = '_'
         return done
-            
+
     def findNeighbors(self, x, y):
         nbors = list(())
         nbors.append(self.graph[x][y])
@@ -105,17 +105,17 @@ class Graph:
         if(y < self.ydim - 1):
             nbors.append(self.graph[x][y+1])
         return nbors
-    
+
     def checkConstraints(self, x, y):
         i = self.graph[x][y].symbol #symbol we're testing
         valid = True
         nbors = self.findNeighbors(x, y)
         nbors.append(self.graph[x][y])
-        
+
         for j in nbors:
             if j.symbol == "_":
                 continue
-            print(j.symbol)
+            #print(j.symbol)
             cnbors = self.findNeighbors(j.x, j.y)
             if j.symbol.isupper(): #Make sure endpoints don't have more than one matching color coming out of them and that if it doesn't have any, that it has at least one blank adjacent square
                 symbolCount = includesSquare(j.symbol.lower(), cnbors)
@@ -140,7 +140,7 @@ class Graph:
                     valid = False
                     print("not enough blank 2")
         return valid
-                    
+
     def getNext(self, x, y):
         if x == self.xdim - 1 and y == self.ydim - 1:
             return None
@@ -148,14 +148,14 @@ class Graph:
             return [0, y + 1]
         else:
             return [x + 1, y]
-    
+
     def printGraph(self):
         for i in range(self.xdim):
             line = ""
             for j in range(self.ydim):
                 line += self.graph[i][j].symbol
             print(line)
-        
+
 
 g5x5 = Graph("B__RO___Y___Y___RO_G_BG__", 5, 5)
 g7x7 = Graph("___O____B__GY____BR_____Y____________R____G___O__", 7, 7)
