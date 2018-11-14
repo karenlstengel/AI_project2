@@ -65,7 +65,8 @@ class Graph:
 
     def makeQueue(self):
         #set constraints and set up max priority queue
-
+        if self.squaresByConst.qsize() > 0:
+            self.squaresByConst = PriorityQueue()
         for i in range(self.xdim):
             for j in range(self.ydim):
                 if self.graph[i][j].symbol == "_":
@@ -73,6 +74,22 @@ class Graph:
                     priorityNum = -self.graph[i][j].constrained
                     self.squaresByConst.put(((priorityNum, self.eCount), self.graph[i][j])) #set up as max priority queue instead of min
                     self.eCount = self.eCount + 1
+
+    def countColors(self, nbors, options):
+        temp = list()
+        counts = PriorityQueue()
+        reordered = list()
+        for x in nbors:
+            temp.append(x.symbol.lower())
+        #print(temp)
+        for x in options:
+            counts.put((-temp.count(x), x))
+        while not counts.empty():
+            hi = counts.get()
+            #print(hi)
+            reordered.append(hi[1])
+
+        return reordered
 
     def solvePuzzleSmart(self):
         self.count=0
@@ -82,7 +99,7 @@ class Graph:
         self.makeQueue()
 
         start = self.squaresByConst.get()[1]
-        if(self.solveSquareSmart(start, 0)):
+        if(self.solveSquareSmart(start)):
             print("Solution:")
             self.printGraph()
             #return self.graph
@@ -100,7 +117,7 @@ class Graph:
         else:
             print("No solution.")"""
 
-    def solveSquareSmart(self, current, index):
+    def solveSquareSmart(self, current):
         #if this is the last square, that means we've found a solution
 
         done = False #keeps track of whether constraints are violated
@@ -108,35 +125,39 @@ class Graph:
         y = current.y
         nbors = self.findNeighbors(x, y)
 
-
+        #recurzive version
         if self.graph[x][y].symbol != "_": #not a filled square and not the last square
-            done = self.solveSquareSmart(self.squaresByConst.get()[1], 0)
+            print("hi")
+            done = self.solveSquareSmart(self.squaresByConst.get()[1])
         else: #this square must be blank
+            #reorganize the colors prioritizing most occuring in nbors
+            self.options = self.countColors(nbors, self.options)
             for i in self.options: #loop through all possible colors, checking validity of each one
                 self.graph[x][y].symbol = i
                 self.count += 1
                 #print(len(self.squaresByConst))
-                self.printGraph()
+                #print("")
+                #self.printGraph()
                 #time.sleep(0.5)#pick a color and assign it
                 valid = self.checkConstraints(x, y, nbors) #make sure this doesn't violate any constraints
 
                 if valid:
-                    if self.squaresByConst.empty(): #we've reached a solution, so return
-                        return True
                     blankNum = True
                     for i in range(self.xdim):
                         for j in range(self.ydim):
                             if self.graph[i][j].symbol == "_":
                                 blankNum = False
                                 break
-                    if blankNum == True:
+                    if self.squaresByConst.empty(): #we've reached a solution, so return
+                        return True
+                    elif blankNum == True:
                         done = True
                         return done
                     else:
                         #update Constraints
                         self.makeQueue()
 
-                        done = self.solveSquareSmart(self.squaresByConst.get()[1], 0) #recursively call the solve method on the next square
+                        done = self.solveSquareSmart(self.squaresByConst.get()[1]) #recursively call the solve method on the next square
 
                         if done == True: #end if we've reached a solution
                             return done
@@ -261,6 +282,7 @@ g10x10 = Graph("RG____________O___O__YP_Q___Q_____________G_____________R_______
 g8x8 = Graph("___R__G__BYP_______O_GR____P__________Y_____BOQ__Q______________", 8, 8)
 g9x9 = Graph("D__BOK_____O__R_____RQ__Q__DB________G__________P____G__Y___Y________KP__________", 9, 9)
 currentTime = time.time()
-g7x7.solvePuzzleSmart()
+#g8x8.solvePuzzleSmart()
 #g5x5.solvePuzzleSmart()
+g10x10.solvePuzzleSmart()
 print("runtime: ", time.time() - currentTime)
