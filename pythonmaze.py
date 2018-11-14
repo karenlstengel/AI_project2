@@ -1,7 +1,7 @@
 from array import *
-import time
+
 """script for for main"""
-'''import CSP
+"""import CSP
 import Maze
 import sys
 
@@ -19,14 +19,13 @@ if __name__ == "__main__":
     print(dim2)
     graph = ""
     for l in lines:
-        graph = graph + l'''
+        graph = graph + l"""
 
 
-def includesSquare(symbol, squareList):
+def includesSquare(symbol, squareList): #counts the number of occurrences of a symbol in a list of squares
     count = 0
     for i in squareList:
         if i.symbol == symbol:
-        #squareList.remove(i)
             count += 1
     return count
 
@@ -38,13 +37,13 @@ class Square:
 
 class Graph:
     def __init__(self, inString, x, y):
-        self.graph = []
-        self.xdim = x
-        self.ydim = y
-        self.colors = set(())
+        self.graph = [] #double array of squares
+        self.xdim = x #x-dimension
+        self.ydim = y #y-dimension
+        self.colors = set(()) #all colors included in the graph
         k = 0
         end = len(inString) - 1
-        for i in range(x):
+        for i in range(x): #build graph from string
             line = []
             for j in range(y):
                 if k <= end:
@@ -56,7 +55,11 @@ class Graph:
         self.colors.remove("_")
 
     def solvePuzzleDumb(self):
-        if self.solveSquare(0, 0):
+        print("Unsolved Puzzle:")
+        self.printGraph()
+        if self.solveSquare(0, 0, "dumb"):
+            print("Solution:")
+            self.printGraph()
             return self.graph
         else:
             print("No solution.")
@@ -78,24 +81,25 @@ class Graph:
             done = self.solveSquare(nextSquare[0], nextSquare[1])
         else:
             options = set(())
-            for i in self.colors:
+            for i in self.colors: #create a list of lower case colors available
                 options.add(i.lower())
             for i in options:
                 self.graph[x][y].symbol = i
                 #print(i)
                 valid = self.checkConstraints(x, y)
                 if valid:
-                    print("valid")
-                    done = self.solveSquare(nextSquare[0], nextSquare[1])
-                    if done == True:
-                        return done
-            if done == False:
+                    if nextSquare is None: #if this is the last square, then we've reached a solution, so return
+                        return True
+                    else:
+                        done = self.solveSquare(nextSquare[0], nextSquare[1], smartDumb) #recursively call the solve method on the next square
+                        if done == True: #end if we've reached a solution
+                            return done
+            if done == False: #rewrite over the symbol as blank of none of this options are valid
                 self.graph[x][y].symbol = '_'
-        return done
+        return done #return solution or not
 
-    def findNeighbors(self, x, y):
+    def findNeighbors(self, x, y): #returns all neighbors of a square in a list
         nbors = list(())
-        nbors.append(self.graph[x][y])
         if(x > 0):
             nbors.append(self.graph[x-1][y])
         if(y > 0):
@@ -107,9 +111,9 @@ class Graph:
         return nbors
 
     def checkConstraints(self, x, y):
-        i = self.graph[x][y].symbol #symbol we're testing
+        i = self.graph[x][y].symbol #symbol of square we're testing
         valid = True
-        nbors = self.findNeighbors(x, y)
+        nbors = self.findNeighbors(x, y) #check that placing this value in this square doesn't violate any neighboring constraints
         nbors.append(self.graph[x][y])
 
         for j in nbors:
@@ -120,25 +124,20 @@ class Graph:
             if j.symbol.isupper(): #Make sure endpoints don't have more than one matching color coming out of them and that if it doesn't have any, that it has at least one blank adjacent square
                 symbolCount = includesSquare(j.symbol.lower(), cnbors)
                 blankCount = includesSquare("_", cnbors)
-                print("is upper")
-                if symbolCount > 1:
+                if symbolCount > 1: #more than one of same color connecting
                     valid = False
-                    print("too many connectors (upper)")
-                if blankCount == 0 and symbolCount != 1:
+                if blankCount == 0 and symbolCount != 1: #no available ways to connect to endpoint
                     valid = False
-                    print("no available connectors (upper)")
-            else: #Symbol is not an endpoint
+            else: #Symbol is not an endpoint, but we have to make sure it's not blocked in by other colors either
                 symbolCount = includesSquare(j.symbol, cnbors)
+                symbolCount += includesSquare(j.symbol.upper(), cnbors)
                 blankCount = includesSquare("_", cnbors)
-                if symbolCount > 2:
+                if symbolCount > 2: #too many of same color connecting
                     valid = False
-                    print("too many connectors (lower)")
-                if symbolCount == 1 and blankCount < 1:
+                if symbolCount == 1 and blankCount < 1: #not enough blank spaces to connect
                     valid = False
-                    print("not enough blank 1")
-                if symbolCount == 0 and blankCount < 2:
+                if symbolCount == 0 and blankCount < 2: #not enough blank spaces to connect
                     valid = False
-                    print("not enough blank 2")
         return valid
 
     def getNext(self, x, y):
@@ -164,13 +163,5 @@ g9x9 = Graph("D__BOK_____O__R_____RQ__Q__DB________G__________P____G__Y___Y_____
 g10x10 = Graph("RG____________O___O__YP_Q___Q_____________G_____________R_________B___P__________Y______B___________", 10, 10)
 g12x12 = Graph("_____________________________K_Y_G_____Y___G_____O_P______Q____R_OQ_________P_ARK____D__D_W_______________W___B_______B__________A_____________", 12, 12)
 g14x14 = Graph("_______________B___A______________W____RP_D____A__W____________OB____G_OY______K_____________D____G___________________R_Y___________Q_______________________QP_______________K______________________", 14, 14)
-g5x5.printGraph()
+
 g5x5.solvePuzzleDumb()
-#g5x5.printGraph()
-'''
-g5x5.printGraph()
-g5x5.getOptions(3, 3)
-g7x7.printGraph()
-g7x7.getOptions(4, 4)
-g14x14.printGraph()
-g14x14.getOptions(7, 7)'''
