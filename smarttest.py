@@ -41,6 +41,7 @@ class Graph:
         self.xdim = x #x-dimension
         self.ydim = y #y-dimension
         self.colors = set(()) #all colors included in the graph
+        self.eCount = 0
         k = 0
         end = len(inString) - 1
         for i in range(x): #build graph from string
@@ -62,32 +63,32 @@ class Graph:
     def getConstrained(self, square):
         return square.constrained
 
-    def solvePuzzleSmart(self):
-        self.count=0
-        eCount = 0
-        print("Unsolved Puzzle:")
-        self.printGraph()
+    def makeQueue(self):
         #set constraints and set up max priority queue
+
         for i in range(self.xdim):
             for j in range(self.ydim):
                 if self.graph[i][j].symbol == "_":
                     self.graph[i][j].constrained = self.howConstrained(self.findNeighbors(i, j))
                     priorityNum = -self.graph[i][j].constrained
-                    self.squaresByConst.put(((priorityNum, eCount), self.graph[i][j])) #set up as max priority queue instead of min
-                    eCount = eCount + 1
+                    self.squaresByConst.put(((priorityNum, self.eCount), self.graph[i][j])) #set up as max priority queue instead of min
+                    self.eCount = self.eCount + 1
 
-        while not self.squaresByConst.empty():
-            x = self.squaresByConst.get()
-            print(x[1].x)
+    def solvePuzzleSmart(self):
+        self.count=0
 
-        if(self.solveSquareSmart(self.squaresByConst.get()[1].x, self.squaresByConst.get()[1].y, 0)):
+        print("Unsolved Puzzle:")
+        self.printGraph()
+        self.makeQueue()
+
+        start = self.squaresByConst.get()[1]
+        if(self.solveSquareSmart(start, 0)):
             print("Solution:")
             self.printGraph()
             #return self.graph
         else:
             print("No Solution.")
         print("Assignments made: " + str(self.count))
-
 
         """print("Unsolved Puzzle:")
         self.printGraph()
@@ -99,13 +100,17 @@ class Graph:
         else:
             print("No solution.")"""
 
-    def solveSquareSmart(self, x, y, index):
+    def solveSquareSmart(self, current, index):
         #if this is the last square, that means we've found a solution
+
         done = False #keeps track of whether constraints are violated
+        x = current.x
+        y = current.y
         nbors = self.findNeighbors(x, y)
 
+
         if self.graph[x][y].symbol != "_": #not a filled square and not the last square
-            done = self.solveSquareSmart(self.squaresByConst.get()[1].x, self.squaresByConst.get()[1].y, 0)
+            done = self.solveSquareSmart(self.squaresByConst.get()[1], 0)
         else: #this square must be blank
             for i in self.options: #loop through all possible colors, checking validity of each one
                 self.graph[x][y].symbol = i
@@ -114,12 +119,25 @@ class Graph:
                 self.printGraph()
                 #time.sleep(0.5)#pick a color and assign it
                 valid = self.checkConstraints(x, y, nbors) #make sure this doesn't violate any constraints
-                #update constraints for neighbors here
+
                 if valid:
-                    if self.squaresByConst.empty(): #if this is the last square, then we've reached a solution, so return
+                    if self.squaresByConst.empty(): #we've reached a solution, so return
                         return True
+                    blankNum = True
+                    for i in range(self.xdim):
+                        for j in range(self.ydim):
+                            if self.graph[i][j].symbol == "_":
+                                blankNum = False
+                                break
+                    if blankNum == True:
+                        done = True
+                        return done
                     else:
-                        done = self.solveSquareSmart(self.squaresByConst.get()[1].x, self.squaresByConst.get()[1].y, 0) #recursively call the solve method on the next square
+                        #update Constraints
+                        self.makeQueue()
+
+                        done = self.solveSquareSmart(self.squaresByConst.get()[1], 0) #recursively call the solve method on the next square
+
                         if done == True: #end if we've reached a solution
                             return done
             if done == False: #rewrite over the symbol as blank of none of this options are valid
@@ -243,6 +261,6 @@ g10x10 = Graph("RG____________O___O__YP_Q___Q_____________G_____________R_______
 g8x8 = Graph("___R__G__BYP_______O_GR____P__________Y_____BOQ__Q______________", 8, 8)
 g9x9 = Graph("D__BOK_____O__R_____RQ__Q__DB________G__________P____G__Y___Y________KP__________", 9, 9)
 currentTime = time.time()
-#g7x7.solvePuzzleSmart()
-g5x5.solvePuzzleSmart()
-print(time.time() - currentTime)
+g7x7.solvePuzzleSmart()
+#g5x5.solvePuzzleSmart()
+print("runtime: ", time.time() - currentTime)
