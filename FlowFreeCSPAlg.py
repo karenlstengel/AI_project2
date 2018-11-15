@@ -1,25 +1,7 @@
 from array import *
 import time
-from queue import PriorityQueue
-
-"""script for for main"""
-"""import CSP
-import Maze
 import sys
-if __name__ == "__main__":
-    print("hello world")
-    file = str(sys.argv[1])
-    with open(file) as f:
-        lines = f.readlines()
-    lines = [l.strip() for l in lines]
-    dim = len(lines[0])
-    dim2 = len(lines)
-    print(dim)
-    print(dim2)
-    graph = ""
-    for l in lines:
-        graph = graph + l"""
-
+from queue import PriorityQueue
 
 def includesSquare(symbol, squareList): #counts the number of occurrences of a symbol in a list of squares
     count = 0
@@ -62,6 +44,18 @@ class Graph:
 
     def getConstrained(self, square):
         return square.constrained
+
+    def solvePuzzleDumb(self):
+        self.count = 0
+        print("Unsolved Puzzle:")
+        self.printGraph()
+        if self.solveSquare(0, 0, "dumb"):
+            print("Solution:")
+            self.printGraph()
+            #return self.graph
+        else:
+            print("No solution.")
+        print("Assignments made: " + str(self.count))
 
     def makeQueue(self):
         #set constraints and set up max priority queue
@@ -107,15 +101,28 @@ class Graph:
             print("No Solution.")
         print("Assignments made: " + str(self.count))
 
-        """print("Unsolved Puzzle:")
-        self.printGraph()
-        startSqr = self.findMostConstrained()
-        if self.solveSquare(startSqr[0], startSqr[1], smartOrDumb="smart"):
-            print("Solution:")
-            self.printGraph()
-            #return self.graph
-        else:
-            print("No solution.")"""
+    def solveSquare(self, x, y, smartOrDumb):
+        #if this is the last square, that means we've found a solution
+        done = False #keeps track of whether constraints are violated
+        nextSquare = self.getNext(x, y, smartOrDumb)
+        nbors = self.findNeighbors(x, y)
+        if self.graph[x][y].symbol != "_" and nextSquare is not None: #not a filled square and not the last square
+            done = self.solveSquare(nextSquare[0], nextSquare[1], smartOrDumb)
+        else: #this square must be blank
+            for i in self.options: #loop through all possible colors, checking validity of each one
+                self.graph[x][y].symbol = i #pick a color and assign it
+                self.count += 1
+                valid = self.checkConstraints(x, y, nbors) #make sure this doesn't violate any constraints
+                if valid:
+                    if nextSquare is None: #if this is the last square, then we've reached a solution, so return
+                        return True
+                    else:
+                        done = self.solveSquare(nextSquare[0], nextSquare[1], smartOrDumb) #recursively call the solve method on the next square
+                        if done == True: #end if we've reached a solution
+                            return done
+            if done == False: #rewrite over the symbol as blank of none of this options are valid
+                self.graph[x][y].symbol = '_'
+        return done #return solution or not
 
     def solveSquareSmart(self, current):
         #if this is the last square, that means we've found a solution
@@ -124,10 +131,7 @@ class Graph:
         x = current.x
         y = current.y
         nbors = self.findNeighbors(x, y)
-
-        if self.count % 10 == 0:
-            print(self.count)
-
+        
         #recurzive version
         if self.graph[x][y].symbol != "_": #not a filled square and not the last square
             print("hi")
@@ -169,14 +173,6 @@ class Graph:
 
         return done #return solution or not
 
-    def nextSquareSmart(self, index):
-        if len(self.squaresByConst) - 1 < index:
-            return None
-        else:
-            square = self.squaresByConst[index]
-            return [square.x, square.y]
-
-
     def findNeighbors(self, x, y): #returns all neighbors of a square in a list
         nbors = list(())
         if(x > 0):
@@ -193,7 +189,7 @@ class Graph:
         current = self.graph[0][0]
         for i in range(self.xdim):
             for j in range(self.ydim):
-                self.graph[i][j].constrained = self.howConstrained(self.graph[i][j], self.findNeighbors(i, j))
+                self.graph[i][j].constrained = self.howConstrained(self.findNeighbors(i, j))
                 if (self.graph[i][j].constrained >= current.constrained and self.graph[i][j].symbol == "_") or (current.symbol != "_" and self.graph[i][j].symbol == "_"):
                     current = self.graph[i][j]
         if current.symbol != "_":
@@ -267,25 +263,30 @@ class Graph:
                 line += self.graph[i][j].symbol
             print(line)
 
-g5x5 = Graph("B__RO___Y___Y___RO_G_BG__", 5, 5)
-g7x7 = Graph("___O____B__GY____BR_____Y____________R____G___O__", 7, 7)
-g8x8 = Graph("___R__G__BYP_______O_GR____P__________Y_____BOQ__Q______________", 8, 8)
-g9x9 = Graph("D__BOK_____O__R_____RQ__Q__DB________G__________P____G__Y___Y________KP__________", 9, 9)
-g10x10 = Graph("RG____________O___O__YP_Q___Q_____________G_____________R_________B___P__________Y______B___________", 10, 10)
-g12x12 = Graph("_____________________________K_Y_G_____Y___G_____O_P______Q____R_OQ_________P_ARK____D__D_W_______________W___B_______B___________A_____________", 12, 12)
-g14x14 = Graph("_______________B___A______________W____RP_D____A__W____________OB____G_OY______K_____________D____G___________________R_Y___________Q_______________________QP_______________K______________________", 14, 14)
-currentTime = time.time()
-#g5x5.solvePuzzleDumb2()
-#g5x5.solvePuzzleSmart()
-#print(time.time() - currentTime)
+if __name__ == "__main__":
+    print("hello world")
+    file = str(sys.argv[1])
 
-g5x5 = Graph("B__RO___Y___Y___RO_G_BG__", 5, 5)
-g7x7 = Graph("___O____B__GY____BR_____Y____________R____G___O__", 7, 7)
-g10x10 = Graph("RG____________O___O__YP_Q___Q_____________G_____________R_________B___P__________Y______B___________", 10, 10)
-g8x8 = Graph("___R__G__BYP_______O_GR____P__________Y_____BOQ__Q______________", 8, 8)
-g9x9 = Graph("D__BOK_____O__R_____RQ__Q__DB________G__________P____G__Y___Y________KP__________", 9, 9)
-currentTime = time.time()
-#g8x8.solvePuzzleSmart()
-#g5x5.solvePuzzleSmart()
-g12x12.solvePuzzleSmart()
-print("runtime: ", time.time() - currentTime)
+    with open(file) as f:
+        lines = f.readlines()
+    lines = [l.strip() for l in lines]
+
+    dim = len(lines[0])
+    dim2 = len(lines)
+    graph = ""
+
+    if dim != dim2:
+        print("not a valid graph!")
+    else:
+        for l in lines:
+            graph = graph + l
+
+    gd = Graph(graph, dim, dim)
+    currentTime = time.time()
+    gd.solvePuzzleSmart()
+    print(time.time() - currentTime)
+
+    gs = Graph(graph, dim, dim)
+    currentTime = time.time()
+    gs.solvePuzzleDumb()
+    print(time.time() - currentTime)
