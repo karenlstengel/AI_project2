@@ -131,7 +131,7 @@ class Graph:
         x = current.x
         y = current.y
         nbors = self.findNeighbors(x, y)
-        
+
         #recurzive version
         if self.graph[x][y].symbol != "_": #not a filled square and not the last square
             print("hi")
@@ -282,11 +282,13 @@ if __name__ == "__main__":
             graph = graph + l
 
     gd = Graph(graph, dim, dim)
+    print("Dumb CSP algorithm on graph {0}x{1}: ".format(str(dim), str(dim)))
     currentTime = time.time()
-    gd.solvePuzzleSmart()
+    gd.solvePuzzleDumb()
     print(time.time() - currentTime)
 
     gs = Graph(graph, dim, dim)
+    print("Smart CSP algorithmon graph {0}x{1}: ".format(str(dim), str(dim)))
     currentTime = time.time()
-    gs.solvePuzzleDumb()
+    gs.solvePuzzleSmart()
     print(time.time() - currentTime)
