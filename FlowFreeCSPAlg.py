@@ -264,7 +264,7 @@ class Graph:
             print(line)
 
 if __name__ == "__main__":
-    print("hello world")
+    
     file = str(sys.argv[1])
 
     with open(file) as f:
