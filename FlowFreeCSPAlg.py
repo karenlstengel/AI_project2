@@ -10,20 +10,20 @@ def includesSquare(symbol, squareList): #counts the number of occurrences of a s
             count += 1
     return count
 
-class Square:
+class Square: #Square class. a square is an indiviudal location on the grid
     def __init__(self, symbol, x, y):
-        self.symbol = symbol
-        self.x = x
-        self.y = y
-        self.constrained = 0
+        self.symbol = symbol #char contained
+        self.x = x #x coord
+        self.y = y # ycoord
+        self.constrained = 0 #number of assigned neighbors
 
-class Graph:
+class Graph: #graph class. data structure for the grid
     def __init__(self, inString, x, y):
         self.graph = [] #double array of squares
         self.xdim = x #x-dimension
         self.ydim = y #y-dimension
         self.colors = set(()) #all colors included in the graph
-        self.eCount = 0
+        self.eCount = 0 #for tie breaking in priority queue
         k = 0
         end = len(inString) - 1
         for i in range(x): #build graph from string
@@ -36,9 +36,9 @@ class Graph:
                     k += 1
             self.graph.append(line)
         self.colors.remove("_") #remove blank squares
-        self.squaresByConst = PriorityQueue()
-        self.count = 0
-        self.options = set(())
+        self.squaresByConst = PriorityQueue() #queue for smart alg
+        self.count = 0 #number of assignments
+        self.options = set(()) #domains
         for i in self.colors: #create a list of lower case colors available
             self.options.add(i.lower())
 
@@ -52,7 +52,7 @@ class Graph:
         if self.solveSquare(0, 0, "dumb"):
             print("Solution:")
             self.printGraph()
-            #return self.graph
+
         else:
             print("No solution.")
         print("Assignments made: " + str(self.count))
@@ -69,23 +69,23 @@ class Graph:
                     self.squaresByConst.put(((priorityNum, self.eCount), self.graph[i][j])) #set up as max priority queue instead of min
                     self.eCount = self.eCount + 1
 
-    def countColors(self, nbors, options):
+    def countColors(self, nbors, options): #get a list of possible colors organized by how often they appear in nbors
         temp = list()
         counts = PriorityQueue()
         reordered = list()
         for x in nbors:
             temp.append(x.symbol.lower())
-        #print(temp)
+
         for x in options:
             counts.put((-temp.count(x), x))
         while not counts.empty():
             hi = counts.get()
-            #print(hi)
+
             reordered.append(hi[1])
 
         return reordered
 
-    def solvePuzzleSmart(self):
+    def solvePuzzleSmart(self): #uses the smart algorithm to solve the puzzle
         self.count=0
 
         print("Unsolved Puzzle:")
@@ -93,10 +93,10 @@ class Graph:
         self.makeQueue()
 
         start = self.squaresByConst.get()[1]
-        if(self.solveSquareSmart(start)):
+        if(self.solveSquareSmart(start)): #solve and determine if solution exists
             print("Solution:")
             self.printGraph()
-            #return self.graph
+
         else:
             print("No Solution.")
         print("Assignments made: " + str(self.count))
@@ -125,7 +125,6 @@ class Graph:
         return done #return solution or not
 
     def solveSquareSmart(self, current):
-        #if this is the last square, that means we've found a solution
 
         done = False #keeps track of whether constraints are violated
         x = current.x
@@ -142,18 +141,14 @@ class Graph:
             for i in self.options: #loop through all possible colors, checking validity of each one
                 self.graph[x][y].symbol = i
                 self.count += 1
-                #print(len(self.squaresByConst))
-                #print("")
-                #self.printGraph()
-                #time.sleep(0.5)#pick a color and assign it
                 valid = self.checkConstraints(x, y, nbors) #make sure this doesn't violate any constraints
 
                 if valid:
-                    blankNum = True
+                    blankNum = True #means there are no blanks in the grid
                     for i in range(self.xdim):
                         for j in range(self.ydim):
                             if self.graph[i][j].symbol == "_":
-                                blankNum = False
+                                blankNum = False #found a blank
                                 break
                     if self.squaresByConst.empty(): #we've reached a solution, so return
                         return True
@@ -264,31 +259,36 @@ class Graph:
             print(line)
 
 if __name__ == "__main__":
-    
+    #name of file from command line
     file = str(sys.argv[1])
 
+    #creates an array of each line without whitespace
     with open(file) as f:
         lines = f.readlines()
     lines = [l.strip() for l in lines]
 
+    #lenght of each line and number of lines
     dim = len(lines[0])
     dim2 = len(lines)
     graph = ""
 
+    #graph isnt square
     if dim != dim2:
         print("not a valid graph!")
     else:
-        for l in lines:
+        for l in lines: #make one string out of the lines array to pass into Graph()
             graph = graph + l
 
-    gd = Graph(graph, dim, dim)
-    print("Dumb CSP algorithm on graph {0}x{1}: ".format(str(dim), str(dim)))
-    currentTime = time.time()
-    gd.solvePuzzleDumb()
-    print(time.time() - currentTime)
+        #dumb solution
+        gd = Graph(graph, dim, dim)
+        print("Dumb CSP algorithm on graph {0}x{1}: ".format(str(dim), str(dim)))
+        currentTime = time.time()
+        gd.solvePuzzleDumb()
+        print(time.time() - currentTime)
 
-    gs = Graph(graph, dim, dim)
-    print("Smart CSP algorithmon graph {0}x{1}: ".format(str(dim), str(dim)))
-    currentTime = time.time()
-    gs.solvePuzzleSmart()
-    print(time.time() - currentTime)
+        #smart solution
+        gs = Graph(graph, dim, dim)
+        print("Smart CSP algorithmon graph {0}x{1}: ".format(str(dim), str(dim)))
+        currentTime = time.time()
+        gs.solvePuzzleSmart()
+        print(time.time() - currentTime)
